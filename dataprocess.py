@@ -3,14 +3,14 @@ import random
 import numpy as np
 import pandas as pd
 
-from sklearn.model_selection import train_test_split
 import torch
 from torch.utils.data import DataLoader, Subset
 
 from timedataset import TimeDataset
 
+
 class DataProcess:
-    def __init__(self,label_name='') -> None:
+    def __init__(self,slide_config:dict, label_name='') -> None:
         self.data_folder = './data/'
 
         self.chonsen_features_data_csv = self.data_folder + "features.csv"
@@ -24,7 +24,7 @@ class DataProcess:
         if label_name in self.sr_train_data.columns:
             self.sr_train_data = self.sr_train_data.drop(columns=[label_name])
 
-        self.fc_graph = self.create_features_fully_connected_graph(self.chosen_features_lst)
+        self.fc_graph = self._create_features_fully_connected_graph(self.chosen_features_lst)
         self.fc_edges_indexs = self.create_fc_edges_indexs(self.fc_graph, self.chosen_features_lst, self.chosen_features_lst)
         self.fc_edges_indexs = torch.tensor(self.fc_edges_indexs, dtype=torch.long)
 
@@ -32,12 +32,8 @@ class DataProcess:
         self.test_data_in = []
         self.__process_step_1__()
 
-        cfg = {
-            'slide_win': 5,
-            'slide_stride': 1
-        }
-        self.train_dataset = TimeDataset(self.train_data_in, self.fc_edges_indexs, 'train',config=cfg)
-        self.test_dataset = TimeDataset(self.test_data_in, self.fc_edges_indexs, 'test',config=cfg)
+        self.train_dataset = TimeDataset(self.train_data_in, self.fc_edges_indexs, 'train',config=slide_config)
+        self.test_dataset = TimeDataset(self.test_data_in, self.fc_edges_indexs, 'test',config=slide_config)
 
         self.train_dataloader, self.val_dataloader,self.test_dataloader = self.__process_step_2__(self.train_dataset, self.test_dataset,
                                                                              batch=32,val_ratio=0.1)

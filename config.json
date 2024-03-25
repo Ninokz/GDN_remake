@@ -4,9 +4,8 @@
         "input_dim":5,
         "out_layer_num":1,
         "out_layer_inter_dim":128,
-        "topk":5,
-        
-        "slide_win":5,
-        "slide_stride":1
-    }
+        "topk":5
+    },   
+    "slide_win":5,
+    "slide_stride":1 
 }

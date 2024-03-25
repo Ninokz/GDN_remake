@@ -1,3 +1,4 @@
+import json
 import os
 import torch
 import random
@@ -10,17 +11,27 @@ from train import train
 from utils import get_device
 from test import test
 
+with open('config.json', 'r') as f:
+    cfg = json.load(f)
+
+DIM = cfg['tarin_param']['dim']
+INPUT_DIM = cfg['tarin_param']['input_dim']
+OUT_LAYER_NUM = cfg['tarin_param']['out_layer_num']
+OUT_LAYER_INTER_DIM = cfg['tarin_param']['out_layer_inter_dim']
+TOPK = cfg['tarin_param']['topk']
+
+
 class Progeam:
     def __init__(self) -> None:
-        self.dp = DataProcess('attack')
+        self.dp = DataProcess(cfg,'attack')
         edge_index_sets = []
         edge_index_sets.append(self.dp.fc_edges_indexs)
         self.model = GDN(edge_index_sets, len(self.dp.chosen_features_lst),
-                         dim=64,
-                         input_dim=5,
-                         out_layer_num=1,
-                         out_layer_inter_dim=128,
-                         topk=5
+                         dim=DIM,
+                         input_dim=INPUT_DIM,
+                         out_layer_num=OUT_LAYER_NUM,
+                         out_layer_inter_dim=OUT_LAYER_INTER_DIM,
+                         topk=TOPK
                          ).to(get_device())
         
     def run(self):
