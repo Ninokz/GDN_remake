@@ -1,10 +1,14 @@
 {
-    "tarin_param":{
+    "train_param":{
         "dim":64,
         "input_dim":5,
         "out_layer_num":1,
         "out_layer_inter_dim":128,
-        "topk":5
+        "topk":5,
+
+        "epoch": 30,
+        "batch_size": 32,
+        "val_ratio": 0.1
     },   
     "slide_win":5,
     "slide_stride":1 
