@@ -11,7 +11,7 @@ from timedataset import TimeDataset
 
 class DataProcess:
     def __init__(self,label_name='') -> None:
-        self.data_folder = f"{os.getcwd()}/data/"
+        self.data_folder = './data/'
 
         self.chonsen_features_data_csv = self.data_folder + "features.csv"
         self.train_data_csv = self.data_folder + "train.csv"
