@@ -26,7 +26,7 @@ VAL_RATIO = cfg['train_param']['val_ratio']
 EPOCH = cfg['train_param']['epoch']
 
 
-class Progeam:
+class Program:
     def __init__(self) -> None:
         self.dp = DataProcess(cfg, BATCH_SIZE, VAL_RATIO, 'attack')
         edge_index_sets = [self.dp.fc_edges_indexes]
@@ -44,7 +44,7 @@ class Progeam:
 
     def run(self):
         self.train_log = train(self.model, self.dp.train_dataloader, self.dp.val_dataloader,
-                               epoch=30, save_path='./model/gdn.pth')
+                               epoch=EPOCH, save_path='./model/gdn.pth')
         self.model.load_state_dict(torch.load('./model/gdn.pth'))
         best_model = self.model.to(get_device())
         _, self.test_result = test(best_model, self.dp.test_dataloader)
@@ -54,7 +54,5 @@ class Progeam:
 
 
 if __name__ == '__main__':
-    p = Progeam()
+    p = Program()
     p.run()
-
-
