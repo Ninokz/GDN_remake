@@ -35,7 +35,7 @@ class Progeam:
                          input_dim=INPUT_DIM,
                          out_layer_num=OUT_LAYER_NUM,
                          out_layer_inter_dim=OUT_LAYER_INTER_DIM,
-                         topk=TOPK
+                         top_k=TOPK
                          ).to(get_device())
 
         self.train_log = None
