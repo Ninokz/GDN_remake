@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import math
@@ -79,6 +80,7 @@ class GDN(nn.Module):
 
         self.edge_index_sets = edge_index_sets
 
+        # node -> embed
         embed_dim = dim
         self.embedding = nn.Embedding(node_num, embed_dim)
         self.bn_out_layer_in = nn.BatchNorm1d(embed_dim)
@@ -127,24 +129,27 @@ class GDN(nn.Module):
             weights_arr = all_embeddings.detach().clone()
             all_embeddings = all_embeddings.repeat(batch_num, 1)
             weights = weights_arr.view(node_num, -1)
+            # weights shape: rows*columns -> features_length * 64
 
+            # v_j cdot v_i^T
+            # 节点间的仅用余弦相似度计算
             cos_ji_mat = torch.matmul(weights, weights.T)
             normed_mat = torch.matmul(weights.norm(dim=-1).view(-1, 1), weights.norm(dim=-1).view(1, -1))
             cos_ji_mat = cos_ji_mat / normed_mat
+
+            # Top K选择：通过torch.topk选择与每个节点最相似的Top K个节点的索引top_k_indices_ji，用于构建学习到的局部图结构
             dim = weights.shape[-1]
             top_k_num = self.top_k
             top_k_indices_ji = torch.topk(cos_ji_mat, top_k_num, dim=-1)[1]
 
             self.learned_graph = top_k_indices_ji
-
             gated_i = torch.arange(0, node_num).T.unsqueeze(1).repeat(1, top_k_num).flatten().to(device).unsqueeze(0)
             gated_j = top_k_indices_ji.flatten().unsqueeze(0)
-            gated_edge_index = torch.cat((gated_j, gated_i), dim=0)
 
+            gated_edge_index = torch.cat((gated_j, gated_i), dim=0)
             batch_gated_edge_index = DataProcess.get_batch_edge_index(gated_edge_index, batch_num, node_num).to(device)
             gcn_out = self.gnn_layers[i](x, batch_gated_edge_index, node_num=node_num * batch_num,
                                          embedding=all_embeddings)
-
             gcn_outs.append(gcn_out)
 
         x = torch.cat(gcn_outs, dim=1)

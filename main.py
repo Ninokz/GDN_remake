@@ -49,7 +49,6 @@ class Program:
         best_model = self.model.to(get_device())
         _, self.test_result = test(best_model, self.dp.test_dataloader)
         _, self.val_result = test(best_model, self.dp.val_dataloader)
-
         get_score(self.test_result, self.val_result)
 
 
