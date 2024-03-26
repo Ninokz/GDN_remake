@@ -90,7 +90,6 @@ class GDN(nn.Module):
         self.gnn_layers = nn.ModuleList([
             GNNLayer(input_dim, dim, inter_dim=dim + embed_dim, heads=1) for i in range(edge_set_num)
         ])
-
         self.node_embedding = None
         self.top_k = top_k
         self.learned_graph = None
@@ -155,15 +154,16 @@ class GDN(nn.Module):
         x = torch.cat(gcn_outs, dim=1)
         x = x.view(batch_num, node_num, -1)
 
+        # v_i:self.embedding(indexes) cdot z_i:x
         indexes = torch.arange(0, node_num).to(device)
         out = torch.mul(x, self.embedding(indexes))
 
         out = out.permute(0, 2, 1)
         out = F.relu(self.bn_out_layer_in(out))
         out = out.permute(0, 2, 1)
-
         out = self.dp(out)
+
+        # MLP
         out = self.out_layer(out)
         out = out.view(-1, node_num)
-
         return out
