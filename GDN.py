@@ -135,6 +135,7 @@ class GDN(nn.Module):
             cos_ji_mat = torch.matmul(weights, weights.T)
             normed_mat = torch.matmul(weights.norm(dim=-1).view(-1, 1), weights.norm(dim=-1).view(1, -1))
             cos_ji_mat = cos_ji_mat / normed_mat
+            
 
             # Top K选择：通过torch.topk选择与每个节点最相似的Top K个节点的索引top_k_indices_ji，用于构建学习到的局部图结构
             dim = weights.shape[-1]
@@ -144,7 +145,6 @@ class GDN(nn.Module):
             self.learned_graph = top_k_indices_ji
             gated_i = torch.arange(0, node_num).T.unsqueeze(1).repeat(1, top_k_num).flatten().to(device).unsqueeze(0)
             gated_j = top_k_indices_ji.flatten().unsqueeze(0)
-
             gated_edge_index = torch.cat((gated_j, gated_i), dim=0)
             batch_gated_edge_index = DataProcess.get_batch_edge_index(gated_edge_index, batch_num, node_num).to(device)
             gcn_out = self.gnn_layers[i](x, batch_gated_edge_index, node_num=node_num * batch_num,
