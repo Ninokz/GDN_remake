@@ -12,7 +12,6 @@ from utils import get_device
 class OutLayer(nn.Module):
     def __init__(self, in_num, node_num, layer_num, inter_num=512):
         """
-
         :param in_num: 输入特征维度
         :param node_num: 节点数量[参数未使用]
         :param layer_num: MLP中的层数
